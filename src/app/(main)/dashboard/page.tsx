@@ -1,53 +1,56 @@
 "use client"
 
 import React from 'react'
-import ChatForm from '@/app/components/ChatForm'
-import ChatMessage from './components/ChatMessage'
-import { socket } from '@/app/lib/socketClient'
-
-type Message = {
-  sender: string
-  message: string
-}
+import { useRoom } from '../../context/RoomContext'
 
 export default function Home() {
-  const [room, setRoom] = React.useState<string>('')
-  const [joined, setJoined] = React.useState<boolean>(false)
-  const [userName, setUserName] = React.useState<string>('')
-  const [messages, setMessages] = React.useState<Message[]>([])
+    const {socket, rooms} = useRoom()
+    
+    const [room, setRoom] = React.useState<string>('')
 
-  const handleJoinRoom = () => {
-    if (room && userName) {
-      socket.emit("join-room", {room, username: userName})
-      setJoined(true)
-    }
-  }
+    const createChat = () => {
+        socket.emit("createChat", room);
+        setRoom("");
+      };
 
-  const handleSendMessage = (message: string) => {
-    const data = {room, message, sender: userName}
-    setMessages(prev => [...prev, {sender: userName, message}])
-    socket.emit("message", data)
-  }
+//   const handleJoinRoom = () => {
+//     if (room && userName) {
+//       socket.emit("join-room", {room, username: userName})
+//       setJoined(true)
+//     }
+//   }
 
-  React.useEffect(() => {
-    socket.on("message", (data) => {
-      setMessages((prev) => [...prev, data])
-    })
+//   const handleSendMessage = (message: string) => {
+//     const data = {room, message, sender: userName}
+//     setMessages(prev => [...prev, {sender: userName, message}])
+//     socket.emit("message", data)
+//   }
 
-    socket.on("user_joined", (data) => {
-      setMessages((prev) => [...prev, {sender: "system", message: data}])
-    })
+//   React.useEffect(() => {
+//     socket.on("message", (data) => {
+//       setMessages((prev) => [...prev, data])
+//     })
 
-    return () => {
-      socket.off("user_joined")
-      socket.off("message")
-    }
-  }, [])
+//     socket.on("user_joined", (data) => {
+//       setMessages((prev) => [...prev, {sender: "system", message: data}])
+//     })
+
+//     return () => {
+//       socket.off("user_joined")
+//       socket.off("message")
+//     }
+//   }, [])
   
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start w-full w-max-xxl h-full">
-        {!joined ? (
+        <h2 className='mb-4 text-4xl font-bold'>Join the Room!</h2>
+        <input value={room} onChange={(e) => setRoom(e.target.value)} placeholder="Название чата" />
+        <button onClick={createChat}>Создать чат</button>
+        {rooms.map((room) => (
+          <div key={room._id as string}>{room.name}</div>
+        ))}
+        {/* {!joined ? (
           <form className='flex w-full w-max-3xl m-auto flex-col items-center'>
             <h2 className='mb-4 text-4xl font-bold'>Join the Room!</h2>
             <input 
@@ -82,7 +85,7 @@ export default function Home() {
             </div>
             <ChatForm onSendMessage={(val) => handleSendMessage(val)}/>
           </div>
-        )}
+        )} */}
       </main>
     </div>
   );
