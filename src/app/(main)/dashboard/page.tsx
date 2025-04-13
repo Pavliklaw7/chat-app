@@ -1,17 +1,51 @@
 "use client"
 
 import React from 'react'
-import { useRoom } from '../../context/RoomContext'
+// import { useRoom } from '../../context/RoomContext'
+import { useRouter } from 'next/navigation'
+import { IRoom } from '@/app/models/Room'
 
 export default function Home() {
-    const {socket, rooms} = useRoom()
+    // const {socket} = useRoom()
     
     const [room, setRoom] = React.useState<string>('')
+    const [rooms, setRooms] = React.useState([])
 
-    const createChat = () => {
-        socket.emit("createChat", room);
+    const router = useRouter()
+
+    const fetchRooms = async () => {
+      const res = await fetch('/api/rooms')
+      const data = await res.json()
+      setRooms(data.rooms) 
+    }
+
+    const createRoom = async () => {
+
+        // socket.emit("createChat", {room});
+
+        const res = await fetch('/api/rooms/create', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({room}),
+        })
+
+        if (res.ok) {
+          fetchRooms()
+        } else {
+          const data = await res.json()
+          alert(data.error || 'error')        
+        }
         setRoom("");
       };
+
+      const logoutHandler = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' })
+        router.push('/')
+      }
+
+      React.useEffect(() => {
+        fetchRooms()
+      }, [])
 
 //   const handleJoinRoom = () => {
 //     if (room && userName) {
@@ -43,13 +77,25 @@ export default function Home() {
   
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+      <header>
+          <h2 className='mb-4 text-4xl font-bold'>Join the Room!</h2>
+          <div className='flex items-center gap-1 justify-start'>
+            <input className='rounded border p-1' value={room} onChange={(e) => setRoom(e.target.value)} placeholder="Название чата" />
+            <button onClick={createRoom}>Создать чат</button>
+            <button onClick={logoutHandler}>Log out</button>     
+          </div>
+          
+      </header>
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start w-full w-max-xxl h-full">
-        <h2 className='mb-4 text-4xl font-bold'>Join the Room!</h2>
-        <input value={room} onChange={(e) => setRoom(e.target.value)} placeholder="Название чата" />
-        <button onClick={createChat}>Создать чат</button>
-        {rooms.map((room) => (
-          <div key={room._id as string}>{room.name}</div>
-        ))}
+           
+        <div className='grow'>
+          {rooms.map((room: IRoom) => (
+            <div className='flex items-center justify-center w-40 h-40 border rounded-2xl cursor-pointer' key={room._id as string}>
+              <h4>{room.name}</h4>
+            </div>
+          ))}
+        </div>
+     
         {/* {!joined ? (
           <form className='flex w-full w-max-3xl m-auto flex-col items-center'>
             <h2 className='mb-4 text-4xl font-bold'>Join the Room!</h2>

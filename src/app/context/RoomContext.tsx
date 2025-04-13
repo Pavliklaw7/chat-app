@@ -1,3 +1,5 @@
+'use client'
+
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { IRoom } from "../models/Room";
 import { socket } from "../lib/socketClient";
@@ -24,7 +26,7 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
     socket.on("chatCreated", handleNewRoom);
 
     return () => {
-      socket.off("chatCreated", handleNewRoom); // Очищаем слушатель при размонтировании
+      socket.off("chatCreated", handleNewRoom);
     };
   }, []);
 
@@ -35,7 +37,6 @@ export const RoomProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// Хук для использования контекста
 export const useRoom = () => {
   const context = useContext(RoomContext);
   if (!context) {

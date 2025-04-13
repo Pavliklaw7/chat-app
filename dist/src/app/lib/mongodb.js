@@ -1,10 +1,13 @@
 "use strict";
+
+import mongo from "mongoose"
+
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.connectDB = void 0;
-const mongoose_1 = __importDefault(require("mongoose"));
+const mongoose_1 = __importDefault(mongo);
 const MONGODB_URI = process.env.MONGODB_URI;
 if (!MONGODB_URI) {
     throw new Error('There is no MONGODB_URI in envs.');

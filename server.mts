@@ -26,7 +26,7 @@ app.prepare().then(() => {
         console.log("🟢 Пользователь подключен:", socket.id);
 
         socket.on("create-room", async (roomName) => {
-            const roomCount = await Room.default.countDocuments();
+            const roomCount = await Room.countDocuments();
 
             if (roomCount >= 10) {
               socket.emit("error", "🚫 Лимит чатов (10) достигнут!");
@@ -54,7 +54,9 @@ app.prepare().then(() => {
             // @ts-ignore
             const newMessage = new Message({ chatId, username, text });
             await newMessage.save();
+
             socket.to(room).emit("message", {sender, message})
+
         })
 
         socket.on('disconnected', () => {
