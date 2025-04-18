@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Incorrect password' }, { status: 401 })
   }
 
-  const token = jwt.sign({ id: user._id, email: user.email }, JWT_SECRET, {
+  const token = jwt.sign({ id: user._id, name: user.name, email: user.email }, JWT_SECRET, {
     expiresIn: '7d',
   })
 

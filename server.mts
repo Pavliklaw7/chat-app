@@ -3,14 +3,10 @@ import next from 'next'
 import { Server } from "socket.io";
 import { connectDB } from "./src/app/lib/mongodb.js";
 import Room from "./src/app/models/Room.js";
-import Message from "./src/app/models/Message.js"
 
 const dev = process.env.NODE_ENV !== 'production'
 const hostname = process.env.HOSTNAME || 'localhost'
 const port = parseInt(process.env.PORT || "3000", 10)
-
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
 const app = next({dev, hostname, port})
 const handler = app.getRequestHandler()
 
@@ -34,8 +30,6 @@ app.prepare().then(() => {
             }
 
             try {
-                // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-                // @ts-ignore
                 const newRoom = new Room({name: roomName})
                 await newRoom.save()
                 io.emit("room-create", newRoom)
@@ -44,19 +38,14 @@ app.prepare().then(() => {
             }
         })
 
-        socket.on("join-room", ({room, username}) => {
-            socket.join(room)
-            socket.to(room).emit("user_joined", `${username} joined room ${room}`)
+        socket.on("join-room", ({roomId, username}) => {
+            console.log('join-room', {roomId, username})
+            socket.join(roomId)
+            socket.to(roomId).emit("user_joined", `${username} joined room ${roomId}`)
         })
 
-        socket.on("message", async ({room, message, sender}) => {
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            const newMessage = new Message({ chatId, username, text });
-            await newMessage.save();
-
-            socket.to(room).emit("message", {sender, message})
-
+        socket.on("message", async (msg) => {
+            socket.to(msg.roomId).emit("message", {sender: msg.sender, content: msg.content})
         })
 
         socket.on('disconnected', () => {

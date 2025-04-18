@@ -1,4 +1,3 @@
-// app/api/rooms/route.ts
 import { connectDB } from '@/app/lib/mongodb'
 import Room from '@/app/models/Room'
 

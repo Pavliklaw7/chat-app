@@ -1,6 +1,7 @@
 import mongoose, { Document, Model, Schema } from "mongoose"
 
 export interface IRoom extends Document {
+    _id: string
     name: string
     creatorId: string
     lastActivity: Date

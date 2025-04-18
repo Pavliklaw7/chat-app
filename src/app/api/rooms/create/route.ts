@@ -11,12 +11,12 @@ export async function POST(req: Request) {
     if (!token) return Response.json({ error: 'Not authorized' }, { status: 401 })
 
     const payload = jwt.verify(token, JWT_SECRET) as { id: string }
-    const { room } = await req.json()
+    const { roomName } = await req.json()
 
     await connectDB()
 
     const newRoom = await Room.create({
-        name: room,
+        name: roomName,
         creatorId: payload.id,
         lastActivity: new Date(),
     })
