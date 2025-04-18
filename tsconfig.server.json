@@ -1,10 +1,9 @@
 {
     "extends": "./tsconfig.json",
     "compilerOptions": {
-      "module": "CommonJS",
+      "module": "NodeNext",
       "target": "ES2017",
       "outDir": "./dist",
-      "moduleResolution": "Node",
       "strict": true,
       "noEmit": false,
       "isolatedModules": false,
