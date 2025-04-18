@@ -10,8 +10,6 @@ export function middleware(req: NextRequest) {
 
     if (!isLoggedIn && !isPublicPath) return NextResponse.redirect(new URL('/', req.url))
 
-    // if (isLoggedIn && isPublicPath) return NextResponse.redirect(new URL('/dashboard', req.url))
-
     return NextResponse.next()
 }   
 
